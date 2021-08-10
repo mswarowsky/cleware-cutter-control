@@ -33,6 +33,30 @@ int main(int argc, char* argv[]) {
 
 	int USBcount = CWusb.OpenCleware() ;
 	std::cout << "OpenCleware found " << USBcount << " devices" << std::endl;
+    int devID ;
+	for (devID=0 ; devID < USBcount ; devID++) {
+		int Channel = 0 ;
+		int state, ret;
+
+		// get state
+		state = CWusb.GetSwitch(devID, CUSBaccess::SWITCH_0);
+
+		if(state < 0){
+			std::cout << "Read state failed";
+			return 1;
+		}
+		std::cout << "Read state:" << state << std::endl;
+
+		//toggle state
+		state = state^1;
+
+		//set new state
+		ret = CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, state);
+		
+		if(ret != 1){
+			std::cout << "Set state " << state << " failed with code " << ret << std::endl;
+		}
+	}
 			
 	return 0;
 }
