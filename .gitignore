@@ -33,3 +33,6 @@
 
 # Exclude build dir
 build
+
+# Not include VC code workspace
+.vscode
