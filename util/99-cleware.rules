@@ -1,0 +1,3 @@
+# Grands read permission to hiddcev devices includen the cleware USB cutter
+# This file should be copied to /dev/udev/rules.d
+KERNEL=="hiddev*", MODE="0666"

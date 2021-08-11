@@ -7,6 +7,7 @@ A simple tool to control a [cleware USB cutter](https://www.cleware-shop.de/epag
 1. Extract the content to `libs/USBaccess`
 1. Make sure you have the [C++ boost libary](https://www.boost.org) installed on your system 
 1. Clone the repo
+1. Install the the udev rules to have access to the device file (needs root permissions) `cp util/99-cleware.rules /etc/udev/rules.de` 
 1. Create build folder ` makedir build`
 1. Enter build folder `cd build`
 1. Call cmake `cmake ..`
