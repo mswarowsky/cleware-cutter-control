@@ -31,9 +31,9 @@ int ToggleCutterCommand::execute(){
     CUSBaccess CWusb;
 
     int USBcount = CWusb.OpenCleware();
-    int ret ;
+    int ret = 0;
 	for (int devID=0 ; devID < USBcount ; devID++) {
-		int state, ret = 0;
+		int state;
 
 		// get state
 		state = CWusb.GetSwitch(devID, CUSBaccess::SWITCH_0);
