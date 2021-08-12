@@ -1,0 +1,13 @@
+Source: cleware-cutter-control
+Section: unknown
+Priority: optional
+Maintainer: Markus Swarowsky <>
+Build-Depends: cmake, debhelper (>=11~)
+Standards-Version: 4.1.4
+Homepage: <https://github.com/mswarowsky/cleware-cutter-control>
+
+Package: cleware-cutter-control
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: A simple tool to control a cleware USB cutter

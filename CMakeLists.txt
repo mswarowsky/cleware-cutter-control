@@ -12,7 +12,6 @@ enable_language(CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wsign-conversion")
 
-set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 
 
 #######################################################
@@ -32,3 +31,16 @@ include_directories(${PROJECT_SOURCE_DIR}/libs/CutterCommand)
 
 add_subdirectory(libs)
 add_subdirectory(src)
+
+
+
+######################################################
+# Installation and packaging
+######################################################
+install(TARGETS cleware-cutter-control
+        RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+install(FILES "util/99-cleware.rules" DESTINATION "/etc/udev/rules.d")
+
+
+
+
