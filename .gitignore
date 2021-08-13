@@ -36,3 +36,7 @@ build
 
 # Not include VC code workspace
 .vscode
+
+# Not incldue the generated manpage 
+util/man
+*.tar.gz

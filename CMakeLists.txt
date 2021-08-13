@@ -38,8 +38,9 @@ add_subdirectory(src)
 # Installation and packaging
 ######################################################
 install(TARGETS cleware-cutter-control
-        RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-install(FILES "util/99-cleware.rules" DESTINATION "/etc/udev/rules.d")
+        RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+install(FILES "util/99-cleware.rules" DESTINATION "/lib/udev/rules.d")
+install(FILES "util/cleware-cutter-control" DESTINATION "${CMAKE_INSTALL_PREFIX}/man")
 
 
 
