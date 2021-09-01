@@ -2,6 +2,11 @@
 
 A simple tool to control a [cleware USB cutter](https://www.cleware-shop.de/epages/63698188.sf/en_GB/?ViewObjectPath=%2FShops%2F63698188%2FProducts%2F1001%2FSubProducts%2F1001-1).
 
+# Installation from deb package
+1. Add the PPA repo `sudo add-apt-repository ppa:mswarowsky/toybox`
+1. Update package list `sudo apt-get update`
+1. Install package `sudo apt-get install cleware-cutter-control`
+
 # Installation from source
 1. Download the [cleware linux libaries](http://www.cleware.info/downloads/german/Linux_Ubuntu_6.0.1.zip)
 1. Extract the content to `libs/USBaccess`
@@ -13,3 +18,5 @@ A simple tool to control a [cleware USB cutter](https://www.cleware-shop.de/epag
 1. Call cmake `cmake ..`
 1. Call make `make`
 1. The executable will be in the src folder
+
+
