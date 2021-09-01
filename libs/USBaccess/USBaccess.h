@@ -102,19 +102,19 @@ class CUSBaccess {
 		virtual int			SetMultiSwitch(int deviceNo, unsigned long int value) ;
 		virtual int			SetMultiConfig(int deviceNo, unsigned long int directions) ;
 		virtual int			GetCounter(int deviceNo, enum COUNTER_IDs counterID) ;	// COUNTER_IDs ununsed until now
-		virtual int			SetCounter(int deviceNo, int counter, enum COUNTER_IDs counterID) ;	//  -1=error, COUNTER_IDs ununsed until now
+		virtual int			SetCounter(int deviceNo, int counter) ;	//  -1=error, COUNTER_IDs ununsed until now
 		virtual int			SyncDevice(int deviceNo, unsigned long int mask) ;
 		virtual int			GetHWversion(int deviceNo) ;	// return HWversion (0 for pre 2014 designed devices, 13 for new devices)
 		virtual int			IsAmpel(int deviceNo) ;	// return true if this is a traffic light device
 		virtual int			IOX(int deviceNo, int addr, int data) ;		// for internal use only, wrong usage may destroy device	
-		virtual int			IsIdeTec(int deviceNo) ;			// return true if watchdog inverted
+		virtual int			IsIdeTec() ;			// return true if watchdog inverted
 		virtual int			GetFrequency(int deviceNo, unsigned long int *counter, int subDevice) ;
 		virtual void		DebugWrite(char *s) ;
 		virtual void		DebugWrite(char *f, int a1) ;
 		virtual void		DebugWrite(char *f, int a1, int a2) ;
 		virtual void		DebugWrite(char *f, int a1, int a2, int a3) ;
 		virtual void		DebugWrite(char *f, int a1, int a2, int a3, int a4) ;
-		virtual void		Sleep(int ms) { usleep(ms * 1000) ; }	// for Linux
+		virtual void		Sleep(int ms) { usleep((__useconds_t) ms * 1000) ; }	// for Linux
 	} ;
 
 #endif // __USBACCESS_H__

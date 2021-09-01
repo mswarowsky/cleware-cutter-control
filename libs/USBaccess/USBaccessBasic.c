@@ -139,11 +139,19 @@ cwOpenCleware() {
 						int d2 = cwIOX(handleCount, 2, -1) ;
 						if (d2 & 0x20)
 							data[handleCount].isAmpel = 1 ; 
-						d2 &= 0x0f ;
-						if (d2 == 0)
-							data[handleCount].gadgettype = WATCHDOG_DEVICE ;
-						else if (d2 == 1)
-							data[handleCount].gadgettype = AUTORESET_DEVICE ;
+						if (data[handleCount].HWversion != 0 &&
+							!(data[handleCount].gadgetVersionNo >= 0x100 && data[handleCount].gadgetVersionNo < 0x180)	// no Cutter/Multi2
+							) {
+							switch (d2 & 0x0f) {
+								case 0:
+//								case 7:
+									data[handleCount].gadgettype = WATCHDOG_DEVICE ;
+									break ;
+								case 1:
+									data[handleCount].gadgettype = AUTORESET_DEVICE ;
+									break ;
+								}
+							}
 						}
 					}
 				}					

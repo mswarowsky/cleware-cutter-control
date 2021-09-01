@@ -119,20 +119,20 @@ CUSBaccess::SetLED(int deviceNo, enum LED_IDs Led, int value) {
 
 	if (devType == LED_DEVICE && version <= 10) {
 		s[0] = Led ;
-		s[1] = value ;
+		s[1] = static_cast<unsigned char>(value);
 		rval = SetValue(deviceNo, s, 2) ;
 		}
 	else if (devType == TEMPERATURE2_DEVICE || devType == HUMIDITY1_DEVICE) {
 		s[0] = 0 ;
 		s[1] = Led ;
-		s[2] = value ;
+		s[2] = static_cast<unsigned char>(value);
 		s[3] = 0 ;
 		rval = SetValue(deviceNo, s, 4) ;
 		}
 	else if (devType == ENCODER01_DEVICE) {
 		s[0] = 0 ;
 		s[1] = Led ;
-		s[2] = value ;
+		s[2] = static_cast<unsigned char>(value);
 		s[3] = 0 ;
 		s[4] = 0 ;
 		s[5] = 0 ;
@@ -141,7 +141,7 @@ CUSBaccess::SetLED(int deviceNo, enum LED_IDs Led, int value) {
 	else if ((devType == CONTACT00_DEVICE && version > 6) || devType == KEYC01_DEVICE || devType == KEYC16_DEVICE || devType == WATCHDOGXP_DEVICE || devType == SWITCHX_DEVICE) {		// 5 bytes to send
 		s[0] = 0 ;
 		s[1] = Led ;
-		s[2] = value ;
+		s[2] = static_cast<unsigned char>(value);
 		s[3] = 0 ;
 		s[4] = 0 ;
 		rval = SetValue(deviceNo, s, 5) ;
@@ -149,7 +149,7 @@ CUSBaccess::SetLED(int deviceNo, enum LED_IDs Led, int value) {
 	else {
 		s[0] = 0 ;
 		s[1] = Led ;
-		s[2] = value ;
+		s[2] = static_cast<unsigned char>(value);
 		rval = SetValue(deviceNo, s, 3) ;
 		}
 
@@ -172,7 +172,7 @@ CUSBaccess::SetSwitch(int deviceNo, enum SWITCH_IDs Switch, int On) {
 		if (version < 4)	// old version do not invert
 			s[2] = !On ;
 		else
-			s[2] = On ;
+			s[2] = static_cast<unsigned char>(On);
 		rval = SetValue(deviceNo, s, 3) ;
 		if (rval && Switch == SWITCH_0) {			// set LED for first switch
 			if (On) {
@@ -188,7 +188,7 @@ CUSBaccess::SetSwitch(int deviceNo, enum SWITCH_IDs Switch, int On) {
 	else if (devType == ENCODER01_DEVICE) {
 		s[0] = 0 ;
 		s[1] = Switch ;
-		s[2] = On ;
+		s[2] = static_cast<unsigned char>(On);
 		s[3] = 0 ;
 		s[4] = 0 ;
 		s[5] = 0 ;
@@ -203,16 +203,16 @@ CUSBaccess::SetSwitch(int deviceNo, enum SWITCH_IDs Switch, int On) {
 			s[0] = 3 ;
 		else									// new 613 device
 			s[0] = ContactWrite ;
-		s[1] = data >> 8 ;
-		s[2] = data & 0xff ;
-		s[3] = mask >> 8 ;
-		s[4] = mask & 0xff ;
+		s[1] = static_cast<unsigned char>(data >> 8) ;
+		s[2] = static_cast<unsigned char>(data & 0xff) ;
+		s[3] = static_cast<unsigned char>(mask >> 8) ;
+		s[4] = static_cast<unsigned char>(mask & 0xff) ;
 		rval = SetValue(deviceNo, s, 5) ;
 		}
 	else if (devType == COUNTER00_DEVICE) {
 		s[0] = 0 ;
 		s[1] = Switch ;
-		s[2] = On ;
+		s[2] = static_cast<unsigned char>(On) ;
 		rval = SetValue(deviceNo, s, 3) ;
 		}
 	else
@@ -343,7 +343,7 @@ CUSBaccess::GetSwitch(int deviceNo, enum SWITCH_IDs Switch) {
 
 		buf[0] = GetInfo ;
 		buf[1] = OnlineCount ;
-		buf[2] = sequenceNumber ;
+		buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 		SetValue(deviceNo, buf, 3) ;
 		for (int timeout=25 ; timeout > 0 ; timeout--) {
 			Sleep(25) ;
@@ -432,7 +432,7 @@ CUSBaccess::GetMultiSwitch(int deviceNo, unsigned long int *mask, unsigned long 
 			ok = GetSwitch(deviceNo, SWITCH_3) ;
 			}
 		if (ok >= 0) {
-			*value = rval | (ok << 3) ;
+			*value = static_cast<long unsigned int>(rval | (ok << 3));
 			ok = seqNumber ;
 			}
 
@@ -458,15 +458,15 @@ CUSBaccess::GetMultiSwitch(int deviceNo, unsigned long int *mask, unsigned long 
 	if (seqNumber == 0)			// do this internally
 		automatic = 1 ;
 
-	int readMask = 0 ;
+	unsigned int readMask = 0 ;
 	if (mask)
-		readMask = *mask ;
+		readMask =  static_cast<unsigned int>(*mask) ;
 	if (readMask == 0)
 		readMask = 0xffff ;		// get every single bit!!
 
 	for (int autoCnt=4 ; autoCnt > 0 ; autoCnt--) {
 		if (automatic) {
-			seqNumber = SyncDevice(deviceNo, readMask) ;
+			seqNumber = SyncDevice(deviceNo, static_cast<unsigned long>(readMask)) ;
 			Sleep(20) ;
 			}
 
@@ -474,9 +474,9 @@ CUSBaccess::GetMultiSwitch(int deviceNo, unsigned long int *mask, unsigned long 
 			if (GetValue(deviceNo, buf, bufSize)) {
 				if ( (buf[0] & 0x80) == 0)		// this bit indicate valid IO data
 					continue ;
-				if (mask != 0 && !IsIdeTec(deviceNo))
-					*mask =  (buf[2] << 8) + buf[3] ;
-				unsigned long int v = (buf[4] << 8) + buf[5] ;
+				if (mask != 0 && !IsIdeTec())
+					*mask =  static_cast<long unsigned int>((buf[2] << 8) + buf[3]) ;
+				unsigned long int v = static_cast<unsigned long int>((buf[4] << 8) + buf[5]) ;
 				if (version < 7 && devType != KEYC16_DEVICE && devType != KEYC01_DEVICE)
 					*value = 0xffff & ~v ;
 				else
@@ -604,7 +604,7 @@ CUSBaccess::GetCounter(int deviceNo, enum COUNTER_IDs counterID) {
 
 	for (int autoCnt=4 ; autoCnt > 0 ; autoCnt--) {
 		buf[0] = CUSBaccess::GetInfo ;
-		buf[1] = sequenceNumber ;
+		buf[1] = static_cast<unsigned char>(sequenceNumber);
 		buf[2] = 0 ;
 		buf[3] = 0 ;
 		buf[4] = 0 ;
@@ -672,7 +672,7 @@ CUSBaccess::GetFrequency(int deviceNo, unsigned long int *counter, int subDevice
 				Sleep(10) ;
 				continue ;
 				}
-			*counter = ((buf[0] & 0x0f) << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3] ;
+			*counter = static_cast<unsigned long int>(((buf[0] & 0x0f) << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3]) ;
 			rval = (buf[4] << 8) + buf[5] ;
 			break ;
 			}
@@ -686,7 +686,7 @@ CUSBaccess::GetFrequency(int deviceNo, unsigned long int *counter, int subDevice
 
 
 int
-CUSBaccess::SetCounter(int deviceNo, int counter, enum COUNTER_IDs counterID) {	//  -1=error, COUNTER_IDs ununsed until now
+CUSBaccess::SetCounter(int deviceNo, int counter) {	//  -1=error, COUNTER_IDs ununsed until now
 	const int bufSize = 3 ;
 	unsigned char buf[bufSize] ;
 	int ok = -1 ;
@@ -696,8 +696,8 @@ CUSBaccess::SetCounter(int deviceNo, int counter, enum COUNTER_IDs counterID) {	
 
 	if (devType == COUNTER00_DEVICE) {
 		buf[0] = CUSBaccess::Configure ;
-		buf[1] = counter >> 8 ;
-		buf[2] = counter & 0xff ;
+		buf[1] = static_cast<unsigned char>(counter >> 8) ;
+		buf[2] = static_cast<unsigned char>(counter & 0xff) ;
 		if (SetValue(deviceNo, buf, bufSize))
 			ok = 0 ;
 		}
@@ -721,7 +721,7 @@ CUSBaccess::GetManualOnCount(int deviceNo) {
 		for (int timeout=5 ; timeout > 0 ; timeout--) {
 			buf[0] = GetInfo ;
 			buf[1] = ManualCount ;
-			buf[2] = sequenceNumber ;
+			buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 			SetValue(deviceNo, buf, 3) ;
 			for (int timeout2=3 ; timeout2 > 0 ; timeout2--) {
 				Sleep(50) ;
@@ -763,7 +763,7 @@ CUSBaccess::GetManualOnTime(int deviceNo) {
 		for (int timeout=5 ; timeout > 0 ; timeout--) {
 			buf[0] = GetInfo ;
 			buf[1] = ManualTime ;
-			buf[2] = sequenceNumber ;
+			buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 			SetValue(deviceNo, buf, 3) ;
 			for (int timeout2=3 ; timeout2 > 0 ; timeout2--) {
 				Sleep(50) ;
@@ -813,12 +813,12 @@ CUSBaccess::GetOnlineOnCount(int deviceNo) {
 		for (timeout=5 ; timeout > 0 ; timeout--) {
 			buf[0] = GetInfo ;
 			if (devType == WATCHDOGXP_DEVICE) {
-				buf[1] = sequenceNumber ;
+				buf[1] = static_cast<unsigned char>(sequenceNumber) ;
 				SetValue(deviceNo, buf, 5) ;
 				}
 			else {
 				buf[1] = OnlineCount ;
-				buf[2] = sequenceNumber ;
+				buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 				SetValue(deviceNo, buf, 3) ;
 				}
 			for (timeout2=3 ; timeout2 > 0 ; timeout2--) {
@@ -872,7 +872,7 @@ CUSBaccess::GetOnlineOnTime(int deviceNo) {
 		for (int timeout=5 ; timeout > 0 ; timeout--) {
 			buf[0] = GetInfo ;
 			buf[1] = OnlineTime ;
-			buf[2] = sequenceNumber ;
+			buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 			SetValue(deviceNo, buf, 3) ;
 			for (int timeout2=3 ; timeout2 > 0 ; timeout2--) {
 				Sleep(50) ;
@@ -947,7 +947,7 @@ CUSBaccess::StartDevice(int deviceNo) {		// mask in case of CONTACT00-device
 		sequenceNumber = 1 ;
 
 	buf[0] = CUSBaccess::StartMeasuring ;
-	buf[1] = sequenceNumber ;
+	buf[1] = static_cast<unsigned char>(sequenceNumber) ;
 	buf[2] = 0 ;
 	buf[3] = 0 ;
 	buf[4] = 0 ;
@@ -997,7 +997,7 @@ CUSBaccess::SyncDevice(int deviceNo, unsigned long int mask) {		// mask in case 
 	if (mask & 0x80)
 		buf[0] |= 0x01 ;
 	// buf[0] = CUSBaccess::StartMeasuring ;
-	buf[1] = sequenceNumber ;
+	buf[1] = static_cast<unsigned char>(sequenceNumber) ;
 		buf[2] = 0 ;
 		buf[3] = (unsigned char)(mask >> 8) & 0x7f ;
 		buf[4] = (unsigned char)(mask & 0xff) & 0x7f ;
@@ -1019,8 +1019,8 @@ CUSBaccess::CalmWatchdog(int deviceNo, int minutes, int minutes2restart) {
 	USBtype_enum devType = (USBtype_enum)cwGetUSBType(deviceNo) ;
 
 	buf[0] = CUSBaccess::KeepCalm ;
-	buf[1] = minutes ;
-	buf[2] = minutes2restart ;
+	buf[1] = static_cast<unsigned char>(minutes) ;
+	buf[2] = static_cast<unsigned char>(minutes2restart) ;
 	if (devType == AUTORESET_DEVICE || devType == WATCHDOG_DEVICE || devType == SWITCH1_DEVICE)
 		ok = SetValue(deviceNo, buf, 3) ;
 	else if (devType == CONTACT00_DEVICE || devType == SWITCHX_DEVICE || devType == WATCHDOGXP_DEVICE)
@@ -1073,7 +1073,7 @@ CUSBaccess::GetTemperature(int deviceNo) {
 		}
 	float ftemp = -200. ;
 	if (r2 > 0)
-		ftemp = temperatur ;
+		ftemp = static_cast<float>(temperatur) ;
 	return ftemp ;
 	}
 
@@ -1120,7 +1120,7 @@ CUSBaccess::GetHumidity(int deviceNo) {
 		}
 	float ftemp = -200. ;
 	if (r2 > 0)
-		ftemp = humidity ;
+		ftemp = static_cast<float>(humidity) ;
 	return ftemp ;
 	}
 
@@ -1300,8 +1300,8 @@ CUSBaccess::SelectADC(int deviceNo, int subDevice) {
 	unsigned char buf[bufSize] ;
 
 		buf[0] = GetInfo ;
-		buf[1] = subDevice ;
-		buf[2] = sequenceNumber ;
+		buf[1] = static_cast<unsigned char>(subDevice) ;
+		buf[2] = static_cast<unsigned char>(sequenceNumber) ;
 		SetValue(deviceNo, buf, 3) ;
 		if (++sequenceNumber >= 128)
 			sequenceNumber = 1 ;
@@ -1340,7 +1340,7 @@ CUSBaccess::GetADC(int deviceNo, int sequenceNumber, int subDevice) {
 				adcVal = (buf[2] << 8) + buf[3] ;
 			else
 				adcVal = (buf[4] << 8) + buf[5] ;
-			ftemp = adcVal / 40.95 ;		// * 100 / 4095 (2**12-1)
+			ftemp = static_cast<float>(adcVal) / 40.95f ;		// * 100 / 4095 (2**12-1)
 			}
 		}
 	else {
@@ -1360,7 +1360,7 @@ CUSBaccess::GetADC(int deviceNo, int sequenceNumber, int subDevice) {
 			}
 		if (ok) {
 			adcVal = (buf[2] << 8) + buf[3] ;
-			ftemp = adcVal / 40.95 ;		// * 100 / 4095 (2**12-1)
+			ftemp = static_cast<float>(adcVal) / 40.95f ;		// * 100 / 4095 (2**12-1)
 			}
 		}
 
@@ -1382,10 +1382,9 @@ CUSBaccess::GetHWversion(int deviceNo) {
 	}
 
 int	
-CUSBaccess::IsIdeTec(int deviceNo) {
+CUSBaccess::IsIdeTec() {
 
 	int rval = 0 ;		// IdeTec is not handled here
-
 	return rval ;
 	}
 
